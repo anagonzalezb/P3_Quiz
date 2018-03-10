@@ -218,7 +218,7 @@ exports.playCmd =rl=>{
       .then(answer => {
         if( answer.toLowerCase().trim()===quiz.answer){
           puntuacion++;
-          log('CORRECTO - Lleva ${puntuacion} aciertos.');
+          log(`CORRECTO - Lleva ${puntuacion} aciertos.`);
           resolve(playOne());
         }else{
           log('INCORRECTO');
