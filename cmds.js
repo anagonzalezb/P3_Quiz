@@ -204,8 +204,8 @@ exports.playCmd =rl=>{
   const playOne = () =>{
     return new Promise((resolve,reject)=>{
       if (preguntas.length ==0){
-        log(`No hay nada mas que preguntar.`);
-        log(`Fin el examen. Aciertos:`);
+        log('No hay nada mas que preguntar.');
+        log('Fin el examen. Aciertos:');
         //biglog(puntuacion ,'magenta');
         resolve();
        // rl.prompt();
@@ -218,10 +218,10 @@ exports.playCmd =rl=>{
       .then(answer => {
         if( answer.toLowerCase().trim()===quiz.answer){
           puntuacion++;
-          log(`CORRECTO - Lleva ${puntuacion} aciertos.`);
+          log('CORRECTO - Lleva ${puntuacion} aciertos.');
           resolve(playOne());
         }else{
-          log(`INCORRECTO`);
+          log('INCORRECTO');
           log(`Fin del examen. Aciertos: ${puntuacion}`);
           //biglog(puntuacion, 'green');
           resolve();
