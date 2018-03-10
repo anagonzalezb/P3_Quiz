@@ -198,14 +198,17 @@ exports.playCmd =rl=>{
 
   let puntuacion =0; 
   let preguntas =[];
+  for(i=0;i<models.quiz.count();i++){
+  	preguntas[i]=i;
+  }
   const playOne = () =>{
-    return new Sequelize.Promise((resolve,reject)=>{
+    return new Promise((resolve,reject)=>{
       if (preguntas.length ==0){
         log(`No hay nada mas que preguntar.`);
         log(`Fin el examen. Aciertos:`);
-        biglog(puntuacion ,'magenta');
+        //biglog(puntuacion ,'magenta');
         resolve();
-        rl.prompt();
+       // rl.prompt();
         return;
       }
       let id= Math.abs(Math.floor((Math.random()*preguntas.length)));
@@ -215,16 +218,13 @@ exports.playCmd =rl=>{
       .then(answer => {
         if( answer.toLowerCase().trim()===quiz.answer){
           puntuacion++;
-          log(`correcto`);
           log(`CORRECTO - Lleva ${puntuacion} aciertos.`);
           resolve(playOne());
         }else{
           log(`INCORRECTO`);
-          log(`incorrecto`);
-          log(`Fin del examen. Aciertos:`);
-          biglog(puntuacion, 'green');
+          log(`Fin del examen. Aciertos: ${puntuacion}`);
+          //biglog(puntuacion, 'green');
           resolve();
-          rl.prompt();
         }
       })
     })
@@ -234,13 +234,13 @@ exports.playCmd =rl=>{
     preguntas =quizzes;
   })
   .then(()=>{
-    playOne();
+    return playOne();
   })
   .catch(e => {console.log("Error:" + e);
   })
   .then(()=>{
-    
-    rl.prompt;
+  	biglog(puntuacion,'green');
+    rl.prompt();
   })
   
 };
