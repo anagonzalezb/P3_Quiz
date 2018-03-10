@@ -193,57 +193,52 @@ exports.testCmd = (rl, id) => {
       
 };
 
+exports.playCmd = rl => {
 
-exports.playCmd =rl=>{
+  		let puntuacion = 0; 
+  		let preguntas = []; 
 
-  let puntuacion =0; 
-  let preguntas =[];
-  for(i=0;i<models.quiz.count();i++){
-  	preguntas[i]=i;
-  }
-  const playOne = () =>{
-    return new Promise((resolve,reject)=>{
-      if (preguntas.length ==0){
-        log('No hay nada mas que preguntar.');
-        log('Fin el examen. Aciertos:');
-        //biglog(puntuacion ,'magenta');
-        resolve();
-       // rl.prompt();
-        return;
-      }
-      let id= Math.abs(Math.floor((Math.random()*preguntas.length)));
-      let quiz=preguntas[id];
-      preguntas.splice(id,1);
-      makeQuestion(rl,quiz.question)
-      .then(answer => {
-        if( answer.toLowerCase().trim()===quiz.answer){
-          puntuacion++;
-          log(`CORRECTO - Lleva ${puntuacion} aciertos.`);
-          resolve(playOne());
-        }else{
-          log('INCORRECTO');
-          log(`Fin del examen. Aciertos: ${puntuacion}`);
-          //biglog(puntuacion, 'green');
-          resolve();
-        }
+  		const playOne = () => {
+        return new Promise ((resolve, reject) => {
+  				if(preguntas.length === 0) {
+            log(' No hay más preguntas','blue');
+            log(' Fin del juego. Aciertos: ');
+  					resolve();
+  					return;
+  				}
+  				let pos = Math.floor(Math.random()*preguntas.length);
+  				let quiz = preguntas[pos];
+  		    preguntas.splice(pos, 1); //lo borro porque ya no lo quiero más
+
+  		    makeQuestion(rl, quiz.question)
+  		    .then(answer => {
+            if(answer.toLowerCase().trim() === quiz.answer.toLowerCase().trim()){
+              puntuacion++;
+  				    log(`  CORRECTO - Lleva ${puntuacion} aciertos`);
+  				    resolve(playOne());
+            }else{
+              log('  INCORRECTO ');
+              log(`  Fin del juego. Aciertos: ${puntuacion} `);
+  				    resolve();
+  			    }
+  		    })
+  	     })
+  	  }
+  		models.quiz.findAll({raw: true}) //el raw hace que enseñe un string solamente en lugar de todo el contenido
+  		.then(quizzes => {
+  			preguntas= quizzes;
       })
-    })
-  }
-  models.quiz.findAll({raw: true})// devuelve un string simplemente con la respuesta o lo que le digas que te saque
-  .then(quizzes=>{
-    preguntas =quizzes;
-  })
-  .then(()=>{
-    return playOne();
-  })
-  .catch(e => {console.log("Error:" + e);
-  })
-  .then(()=>{
-  	biglog(puntuacion,'green');
-    rl.prompt();
-  })
-  
-};
+  		.then(() => {
+  		 	return playOne(); //es necesario esperar a que la promesa acabe, por eso no es un return a secas
+  		 })
+  		.catch(e => {
+  			errorlog("Error:" + e); //usar errorlog con colores
+  		})
+  		.then(() => {
+  			biglog(puntuacion, 'green');
+  			rl.prompt();
+  		})
+}
 exports.creditsCmd = rl => {
       log('Autores de la práctica:', 'magenta');
       log('anagonzalezb', 'magenta');
