@@ -166,31 +166,37 @@ exports.editCmd =(rl, id)=>{
 
 
 exports.testCmd = (rl, id) => {
-      if (typeof id === "undefined"){
-        errorlog(`Falta el parámetro id.`);
-        rl.prompt();
-      } 
-      else{
-         try{
-           const quiz = model.getByIndex(id);
-           rl.question(quiz.question.toString(), respuesta =>{
-             if(respuesta.toLowerCase().trim() === quiz.answer.toLowerCase().trim() ){
-               log('Su respuesta es correcta.','black');
-               biglog("CORRECTA", 'green');
-               rl.prompt();
-             }
-             else {log('Su respuesta es incorrecta.','black');
-               biglog("INCORRECTA", 'red');
-               rl.prompt();
-             }
-           });
-         }catch(error) {
-         errorlog(error.message);
-         rl.prompt();
-       }
-      }
-      
-      
+     validateId(id)
+           .then(id => models.quiz.findById(id))
+           .then(quiz => {
+                if(!quiz){
+                    throw new Error(`No existe un quiz asociado al id=${id}.`);
+                }
+                makeQuestion(rl,quiz.question)
+                .then(answer => {
+                  if(answer.toLowerCase().trim() === quiz.answer.toLowerCase().trim()){
+  			         log('Su respuesta es correcta.','black');
+                     biglog("CORRECTA", 'green');
+                     rl.prompt();
+  				    
+                  }else{
+                     log('Su respuesta es incorrecta.','black');
+                     biglog("INCORRECTA", 'red');
+                     rl.prompt();
+  			      }
+  		        });
+             })
+         .catch(Sequelize.ValidationError, error => {
+         	errorlog('El quiz es erroneo:');
+         	error.errors.forEach(({message}) => errorlog(message));
+         })
+        .catch(error => {
+            errorlog(error.message);
+        })
+        .then(() =>{
+            rl.prompt();
+        }); 
+           
 };
 
 exports.playCmd = rl => {
@@ -238,7 +244,7 @@ exports.playCmd = rl => {
   			biglog(puntuacion, 'green');
   			rl.prompt();
   		})
-}
+};
 exports.creditsCmd = rl => {
       log('Autores de la práctica:', 'magenta');
       log('anagonzalezb', 'magenta');
